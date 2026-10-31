@@ -1,0 +1,13 @@
+[Unit]
+Description=Creates and binds RAM disk right over Kodi's userdata directory
+After=graphical.target
+Before=kodi.service
+ConditionPathExists=/storage/.config/userdata-toram.enabled
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/userdata-toram
+RemainAfterExit=true
+
+[Install]
+WantedBy=kodi.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Updates disp_cap file for systems with bad EDID
+After=graphical.target
+Before=kodi.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/update-dispcap
+RemainAfterExit=true
+
+[Install]
+WantedBy=kodi.target

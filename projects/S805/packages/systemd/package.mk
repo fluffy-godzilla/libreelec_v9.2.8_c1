@@ -232,6 +232,9 @@ post_makeinstall_target() {
   ln -sf /storage/.config/hwdb.d $INSTALL/etc/udev/hwdb.d
   rm -rf $INSTALL/etc/udev/rules.d
   ln -sf /storage/.config/udev.rules.d $INSTALL/etc/udev/rules.d
+
+  cp $PKG_DIR/scripts/update-dispcap $INSTALL/usr/bin
+  cp $PKG_DIR/scripts/userdata-toram $INSTALL/usr/bin
 }
 
 post_install() {
@@ -265,4 +268,6 @@ post_install() {
   enable_service network-base.service
   enable_service systemd-timesyncd.service
   enable_service systemd-timesyncd-setup.service
+  enable_service update-dispcap.service
+  enable_service userdata-toram.service
 }

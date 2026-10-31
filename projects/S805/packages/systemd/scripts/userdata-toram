@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2017-present Team LibreELEC (https://libreelec.tv)
+
+# Clean up any leftover mount points from hard crashes
+umount -f /storage/.kodi/userdata 2>/dev/null
+umount -f /storage/.kodi/temp 2>/dev/null
+umount -f /storage/logfiles 2>/dev/null
+
+# Create standard RAM disks for logs and temp files
+mkdir -p /storage/.kodi/temp /storage/logfiles
+mount -t tmpfs -o size=64M tmpfs /storage/.kodi/temp
+mount -t tmpfs -o size=16M tmpfs /storage/logfiles
+
+# Create a temporary staging directory in RAM
+mkdir -p /tmp/userdata_ram
+mount -t tmpfs -o size=256M tmpfs /tmp/userdata_ram
+
+# Pre-populate the RAM disk with actual SD card configuration
+if [ -d /storage/.kodi/userdata ]; then
+    cp -a /storage/.kodi/userdata/. /tmp/userdata_ram/
+fi
+
+# Bind-mount the populated RAM disk right over the real userdata directory
+mount --bind /tmp/userdata_ram /storage/.kodi/userdata

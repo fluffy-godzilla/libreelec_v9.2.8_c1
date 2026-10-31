@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2018-present Team LibreELEC (https://libreelec.tv)
+
+SOURCE_CAP="/sys/class/amhdmitx/amhdmitx0/disp_cap"
+DEST_CAP="/storage/.kodi/userdata/disp_cap"
+
+# Define your fallback resolutions here (one per line, asterisk denotes default)
+read -r -d '' FALLBACK_MODES << 'EOF'
+1080p60hz*
+1080p50hz
+1080p30hz
+1080p25hz
+1080p24hz
+1080i60hz
+1080i50hz
+720p60hz
+720p50hz
+576p50hz
+480p60hz
+EOF
+
+if [ -f "$SOURCE_CAP" ]; then
+    # Read the first line or contents to check for "null edid"
+    SRC_CONTENT=$(cat "$SOURCE_CAP" 2>/dev/null)
+
+    # make sure the write/overwrite doesn't fail on first boot
+    DEST_CAP_PATH=$(dirname "$DEST_CAP")
+    mkdir -p "$DEST_CAP_PATH"
+    
+    if echo "$SRC_CONTENT" | grep -q "null edid"; then
+        # Source is invalid (null edid). Only write fallback if dest is missing or empty.
+        if [ ! -s "$DEST_CAP" ]; then
+            echo "$FALLBACK_MODES" > "$DEST_CAP"
+        fi
+    else
+        # Source is valid, safely overwrite the destination with live capabilities
+        cat "$SOURCE_CAP" > "$DEST_CAP"
+    fi
+fi
